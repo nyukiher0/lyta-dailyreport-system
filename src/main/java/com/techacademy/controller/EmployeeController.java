@@ -6,6 +6,8 @@ import com.techacademy.entity.Employee;
 import com.techacademy.service.EmployeeService;
 import com.techacademy.service.UserDetail;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -51,8 +53,13 @@ public class EmployeeController {
     // 従業員新規登録画面
     @GetMapping(value = "/add")
     public String create(@ModelAttribute Employee employee) {
-
         return "employees/new";
+    }
+
+    // 従業員更新画面
+    @GetMapping(value = "/{code}/update")
+    public String update(@ModelAttribute Employee employee) {
+        return "employees/update";
     }
 
     // 従業員新規登録処理
@@ -61,8 +68,8 @@ public class EmployeeController {
 
         // パスワード空白チェック
         /*
-         * エンティティ側の入力チェックでも実装は行えるが、更新の方でパスワードが空白でもチェックエラーを出さずに
-         * 更新出来る仕様となっているため上記を考慮した場合に別でエラーメッセージを出す方法が簡単だと判断
+         * 後ほどエンティティ側のバリデーションで以下の対応を行うが暫定的に以下で実装は進める。
+         * また、更新画面でも同様の処理を行うため、リファクタリングのタイミングで共通化を検討する。
          */
         if ("".equals(employee.getPassword())) {
             // パスワードが空白だった場合
@@ -70,6 +77,20 @@ public class EmployeeController {
                     ErrorMessage.getErrorName(ErrorKinds.BLANK_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.BLANK_ERROR));
 
+            return create(employee);
+        }
+
+        // 半角英数字チェック
+
+        /*
+         * 半角英数字のみパスワードとして許容するため、以下でチェックを行う。
+         * また、更新画面でも同様の処理を行うため、リファクタリングのタイミングで共通化を検討する。
+         */
+        if (!employee.getPassword().matches("^[0-9a-zA-Z]+$")) {
+            // 半角英数字以外が含まれていた場合
+            model.addAttribute(
+                    ErrorMessage.getErrorName(ErrorKinds.HALFSIZE_ERROR),
+                    ErrorMessage.getErrorValue(ErrorKinds.HALFSIZE_ERROR));
             return create(employee);
         }
 
@@ -99,6 +120,59 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
+    // 従業員更新処理
+    @PostMapping(value = "/update")
+    public String update(
+            @Validated Employee employee,
+            BindingResult res,
+            Model model,
+            HttpServletResponse response) {
+
+        // パスワード空白チェック
+        /*
+         * 後ほどエンティティ側のバリデーションで以下の対応を行うが暫定的に以下で実装は進める。
+         * また、更新画面でも同様の処理を行うため、リファクタリングのタイミングで共通化を検討する。
+         */
+        if ("".equals(employee.getPassword())) {
+            // パスワードが空白だった場合
+            model.addAttribute(
+                    ErrorMessage.getErrorName(ErrorKinds.BLANK_ERROR),
+                    ErrorMessage.getErrorValue(ErrorKinds.BLANK_ERROR));
+
+            return update(employee);
+        }
+
+        // 半角英数字チェック
+
+        /*
+         * 半角英数字のみパスワードとして許容するため、以下でチェックを行う。
+         * また、更新画面でも同様の処理を行うため、リファクタリングのタイミングで共通化を検討する。
+         */
+        if (!employee.getPassword().matches("^[0-9a-zA-Z]+$")) {
+            // 半角英数字以外が含まれていた場合
+            model.addAttribute(
+                    ErrorMessage.getErrorName(ErrorKinds.HALFSIZE_ERROR),
+                    ErrorMessage.getErrorValue(ErrorKinds.HALFSIZE_ERROR));
+            return update(employee);
+        }
+
+        // 入力チェック
+        if (res.hasErrors()) {
+            return update(employee);
+        }
+
+        // 従業員番号を更新時は指定できない仕様のため、addと異なりtry~catchは不要
+        ErrorKinds result = employeeService.update(employee);
+
+        if (ErrorMessage.contains(result)) {
+            model.addAttribute(
+                    ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+            return update(employee);
+        }
+
+        return "redirect:/employees";
+    }
+
     // 従業員削除処理
     @PostMapping(value = "/{code}/delete")
     public String delete(
@@ -116,5 +190,14 @@ public class EmployeeController {
         }
 
         return "redirect:/employees";
+    }
+
+    // 従業員更新画面
+    @PostMapping(value = "/{code}/update")
+    public String update(@PathVariable("code") String code, Model model) {
+
+        // 更新対象の従業員情報をModelにセット
+        model.addAttribute("employee", employeeService.findByCode(code));
+        return "employees/update";
     }
 }
