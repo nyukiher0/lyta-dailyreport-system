@@ -20,11 +20,11 @@
                     <h1 class="h3 mb-3">従業員 更新</h1>
                 </div>
                 <div class="col-12 col-xxl-6">
-                    <div class="col-xl-12">
-                        <div class="alert alert-light p-1" role="alert">
-                            パスワードは変更する場合のみ入力してください。
-                        </div>
-                        <div class="card">
+                    <div class="card">
+                        <div class="col-xl-12">
+                            <div class="card-header bg-secondary-subtle">
+                                パスワードは変更する場合のみ入力してください。
+                            </div>
                             <div class="card-body">
                                 <form
                                     th:action="@{/employees/update}"
@@ -38,14 +38,10 @@
                                             >
                                             <p class="mb-1"></p>
                                             <div class="col-md-7">
-                                                <input
+                                                <p
                                                     class="form-control bg-secondary-subtle"
-                                                    type="text"
-                                                    th:field="*{code}"
-                                                    th:errorclass="err"
-                                                    id="code"
-                                                    readonly
-                                                />
+                                                    th:text="*{code}"
+                                                ></p>
                                                 <span
                                                     th:errors="*{code}"
                                                     class="text-danger"
@@ -122,7 +118,7 @@
                                     <p class="mt-5">
                                         <input
                                             type="submit"
-                                            value="登録"
+                                            value="更新"
                                             class="btn btn-primary"
                                         />
                                         <a

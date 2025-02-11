@@ -130,16 +130,10 @@ public class EmployeeController {
 
         // パスワード空白チェック
         /*
-         * 後ほどエンティティ側のバリデーションで以下の対応を行うが暫定的に以下で実装は進める。
-         * また、更新画面でも同様の処理を行うため、リファクタリングのタイミングで共通化を検討する。
+         * パスワードが空の場合には、元々のパスワードを保持して/employeesにリダイレクトする。
          */
         if ("".equals(employee.getPassword())) {
-            // パスワードが空白だった場合
-            model.addAttribute(
-                    ErrorMessage.getErrorName(ErrorKinds.BLANK_ERROR),
-                    ErrorMessage.getErrorValue(ErrorKinds.BLANK_ERROR));
-
-            return update(employee);
+            return "redirect:/employees";
         }
 
         // 半角英数字チェック
