@@ -42,6 +42,10 @@
                                                     class="form-control bg-secondary-subtle"
                                                     th:text="*{code}"
                                                 ></p>
+                                                <input
+                                                    type="hidden"
+                                                    th:field="*{code}"
+                                                />
                                                 <span
                                                     th:errors="*{code}"
                                                     class="text-danger"
