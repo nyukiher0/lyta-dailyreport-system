@@ -58,11 +58,6 @@ public class Employee {
     @Column(length = 255, nullable = false)
     private String password;
 
-    // @Column(length = 255, nullable = false)
-    // @NotEmpty
-    // @Length(min = 8, max = 16)
-    // private String password;
-
     // 削除フラグ(論理削除を行うため)
     @Column(columnDefinition = "TINYINT", nullable = false)
     private boolean deleteFlg;
