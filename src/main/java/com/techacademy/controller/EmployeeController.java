@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
 @RequestMapping("employees")
+@SessionAttributes("employee")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -147,11 +149,13 @@ public class EmployeeController {
             model.addAttribute(
                     ErrorMessage.getErrorName(ErrorKinds.HALFSIZE_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.HALFSIZE_ERROR));
+            model.addAttribute("employee", employee);
             return update(employee);
         }
 
         // 入力チェック
         if (res.hasErrors()) {
+            model.addAttribute("employee", employee);
             return update(employee);
         }
 
@@ -161,6 +165,7 @@ public class EmployeeController {
         if (ErrorMessage.contains(result)) {
             model.addAttribute(
                     ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+            model.addAttribute("employee", employee);
             return update(employee);
         }
 
@@ -189,7 +194,6 @@ public class EmployeeController {
     // 従業員更新画面
     @PostMapping(value = "/{code}/update")
     public String update(@PathVariable("code") String code, Model model) {
-
         // 更新対象の従業員情報をModelにセット
         model.addAttribute("employee", employeeService.findByCode(code));
         return "employees/update";
