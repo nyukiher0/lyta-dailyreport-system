@@ -2,6 +2,7 @@ package com.techacademy.service;
 
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Employee;
+import com.techacademy.entity.Report;
 import com.techacademy.repository.EmployeeRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,10 +20,15 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ReportService reportService;
 
-    public EmployeeService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
+    public EmployeeService(
+            EmployeeRepository employeeRepository,
+            PasswordEncoder passwordEncoder,
+            ReportService reportService) {
         this.employeeRepository = employeeRepository;
         this.passwordEncoder = passwordEncoder;
+        this.reportService = reportService;
     }
 
     // 従業員保存
@@ -85,6 +91,12 @@ public class EmployeeService {
         LocalDateTime now = LocalDateTime.now();
         employee.setUpdatedAt(now);
         employee.setDeleteFlg(true);
+
+        // その従業員に紐づく日報を削除
+        List<Report> reports = reportService.findByEmployee(employee);
+        for (Report report : reports) {
+            reportService.delete(report.getId().longValue());
+        }
 
         return ErrorKinds.SUCCESS;
     }

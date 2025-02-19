@@ -5,7 +5,7 @@
     xmlns:th="http://www.thymeleaf.org"
 >
     <head
-        th:replace="common/header :: head_fragment(title=従業員更新画面)"
+        th:replace="common/header :: head_fragment(title=日報更新画面)"
     ></head>
 
     <body class="h-100 overflow-hidden">
@@ -17,35 +17,39 @@
             <div class="mt-3 h-100 col-sm-10">
                 <!-- コンテンツ -->
                 <div class="container-fluid p-0">
-                    <h1 class="h3 mb-3">従業員 更新</h1>
+                    <h1 class="h3 mb-3">日報 更新</h1>
                 </div>
                 <div class="col-12 col-xxl-6">
                     <div class="card">
                         <div class="col-xl-12">
-                            <div class="card-header">
-                                パスワードは変更する場合のみ入力してください。
-                            </div>
                             <div class="card-body">
                                 <form
-                                    th:action="@{/employees/{code}/update(code=*{code})}"
-                                    th:object="${employee}"
+                                    th:action="@{/reports/{id}/update(id=*{id})}"
+                                    th:object="${report}"
                                     th:method="post"
                                 >
                                     <div class="wizard wizard-success mb-4">
                                         <div class="mb-3">
-                                            <label class="form-label" for="code"
-                                                >社員番号</label
+                                            <label
+                                                class="form-label"
+                                                for="reportDate"
+                                                >日付</label
                                             >
                                             <p class="mb-1"></p>
                                             <div class="col-md-7">
-                                                <p th:text="*{code}"></p>
+                                                <input
+                                                    class="form-control"
+                                                    type="date"
+                                                    th:field="*{reportDate}"
+                                                    th:errorclass="err"
+                                                    id="reportDate"
+                                                />
                                                 <span
-                                                    th:errors="*{code}"
+                                                    th:errors="*{reportDate}"
                                                     class="text-danger"
                                                 ></span>
                                                 <span
-                                                    th:if="${codeError} neq null"
-                                                    th:text="${codeError}"
+                                                    th:text="${reportDateError}"
                                                     class="text-danger"
                                                 ></span>
                                             </div>
@@ -56,15 +60,11 @@
                                             >
                                             <p class="mb-1"></p>
                                             <div class="col-md-7">
-                                                <input
-                                                    class="form-control"
-                                                    type="text"
-                                                    th:field="*{name}"
-                                                    th:errorclass="err"
-                                                    id="name"
-                                                />
+                                                <p
+                                                    th:text="${employeeName}"
+                                                ></p>
                                                 <span
-                                                    th:errors="*{name}"
+                                                    th:errors="*{employee.name}"
                                                     class="text-danger"
                                                 ></span>
                                             </div>
@@ -72,43 +72,42 @@
                                         <div class="mb-3">
                                             <label
                                                 class="form-label"
-                                                for="password"
-                                                >パスワード</label
+                                                for="title"
+                                                >タイトル</label
                                             >
                                             <p class="mb-1"></p>
                                             <div class="col-md-7">
                                                 <input
                                                     class="form-control"
-                                                    type="password"
-                                                    th:field="*{password}"
+                                                    type="text"
+                                                    th:field="*{title}"
                                                     th:errorclass="err"
-                                                    id="password"
+                                                    id="title"
                                                 />
                                                 <span
-                                                    th:if="${passwordError} neq null"
-                                                    th:text="${passwordError}"
+                                                    th:errors="*{title}"
                                                     class="text-danger"
                                                 ></span>
                                             </div>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label" for="role"
-                                                >権限</label
+                                            <label
+                                                class="form-label"
+                                                for="content"
+                                                >内容</label
                                             >
                                             <p class="mb-1"></p>
-                                            <div class="col-md-4">
-                                                <select
-                                                    class="form-select"
-                                                    th:field="*{role}"
-                                                    id="role"
-                                                >
-                                                    <option
-                                                        th:each="item:${T(com.techacademy.entity.Employee.Role).values()}"
-                                                        th:value="${item}"
-                                                        th:text="${item.getValue()}"
-                                                        th:selected="*{role} == ${item}"
-                                                    ></option>
-                                                </select>
+                                            <div class="col-md-7">
+                                                <textarea
+                                                    class="form-control"
+                                                    th:field="*{content}"
+                                                    th:errorclass="err"
+                                                    id="content"
+                                                ></textarea>
+                                                <span
+                                                    th:errors="*{content}"
+                                                    class="text-danger"
+                                                ></span>
                                             </div>
                                         </div>
                                     </div>

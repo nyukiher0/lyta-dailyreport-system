@@ -34,6 +34,11 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
+    @ModelAttribute("employee")
+    public Employee setUpEmployee() {
+        return new Employee();
+    }
+
     // 従業員一覧画面
     @GetMapping
     public String list(Model model) {
@@ -60,7 +65,7 @@ public class EmployeeController {
 
     // 従業員更新画面
     @GetMapping(value = "/{code}/update")
-    public String update(@ModelAttribute Employee employee) {
+    public String edit(@ModelAttribute Employee employee) {
         return "employees/update";
     }
 
@@ -78,21 +83,6 @@ public class EmployeeController {
             model.addAttribute(
                     ErrorMessage.getErrorName(ErrorKinds.BLANK_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.BLANK_ERROR));
-
-            return create(employee);
-        }
-
-        // 半角英数字チェック
-
-        /*
-         * 半角英数字のみパスワードとして許容するため、以下でチェックを行う。
-         * また、更新画面でも同様の処理を行うため、リファクタリングのタイミングで共通化を検討する。
-         */
-        if (!employee.getPassword().matches("^[0-9a-zA-Z]+$")) {
-            // 半角英数字以外が含まれていた場合
-            model.addAttribute(
-                    ErrorMessage.getErrorName(ErrorKinds.HALFSIZE_ERROR),
-                    ErrorMessage.getErrorValue(ErrorKinds.HALFSIZE_ERROR));
             return create(employee);
         }
 
@@ -123,8 +113,9 @@ public class EmployeeController {
     }
 
     // 従業員更新処理
-    @PostMapping(value = "/update")
+    @PostMapping(value = "{code}/update")
     public String update(
+            @PathVariable("code") String code,
             @Validated Employee employee,
             BindingResult res,
             Model model,
@@ -138,25 +129,10 @@ public class EmployeeController {
             return "redirect:/employees";
         }
 
-        // 半角英数字チェック
-
-        /*
-         * 半角英数字のみパスワードとして許容するため、以下でチェックを行う。
-         * また、更新画面でも同様の処理を行うため、リファクタリングのタイミングで共通化を検討する。
-         */
-        if (!employee.getPassword().matches("^[0-9a-zA-Z]+$")) {
-            // 半角英数字以外が含まれていた場合
-            model.addAttribute(
-                    ErrorMessage.getErrorName(ErrorKinds.HALFSIZE_ERROR),
-                    ErrorMessage.getErrorValue(ErrorKinds.HALFSIZE_ERROR));
-            model.addAttribute("employee", employee);
-            return update(employee);
-        }
-
         // 入力チェック
         if (res.hasErrors()) {
             model.addAttribute("employee", employee);
-            return update(employee);
+            return edit(employee);
         }
 
         // 従業員番号を更新時は指定できない仕様のため、addと異なりtry~catchは不要
@@ -166,7 +142,7 @@ public class EmployeeController {
             model.addAttribute(
                     ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             model.addAttribute("employee", employee);
-            return update(employee);
+            return edit(employee);
         }
 
         return "redirect:/employees";
@@ -189,13 +165,5 @@ public class EmployeeController {
         }
 
         return "redirect:/employees";
-    }
-
-    // 従業員更新画面
-    @PostMapping(value = "/{code}/update")
-    public String update(@PathVariable("code") String code, Model model) {
-        // 更新対象の従業員情報をModelにセット
-        model.addAttribute("employee", employeeService.findByCode(code));
-        return "employees/update";
     }
 }
