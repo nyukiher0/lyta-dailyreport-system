@@ -4,9 +4,7 @@
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:th="http://www.thymeleaf.org"
 >
-    <head
-        th:replace="common/header :: head_fragment(title=日報更新画面)"
-    ></head>
+    <head th:replace="common/header :: head_fragment(title=日報更新)"></head>
 
     <body class="h-100 overflow-hidden">
         <div class="row h-100">
@@ -118,7 +116,7 @@
                                             class="btn btn-primary"
                                         />
                                         <a
-                                            th:href="@{/employees}"
+                                            th:href="@{/reports}"
                                             class="btn btn-primary"
                                             >戻る</a
                                         >
